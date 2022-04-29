@@ -15,5 +15,7 @@ class Main: JavaPlugin() {
     override fun onEnable() {
         plugin = this
 
+        //  command
+        getCommand("war")?.setExecutor(Command)
     }
 }
