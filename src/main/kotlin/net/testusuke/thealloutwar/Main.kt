@@ -10,10 +10,16 @@ class Main: JavaPlugin() {
 
     companion object {
         lateinit var plugin: Main
+        lateinit var dataBase: DataBase
     }
 
     override fun onEnable() {
         plugin = this
+
+        //  config
+        this.saveDefaultConfig()
+        //  db
+        dataBase = DataBase()
 
         //  command
         getCommand("war")?.setExecutor(Command)
