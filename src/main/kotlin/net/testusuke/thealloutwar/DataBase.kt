@@ -64,8 +64,6 @@ class DataBase {
         }
     }
 
-    //  todo useConnectionを廃止すればいけるかも？
-
     fun update(sql: String, vararg params: String): Int? {
         return getConnection()?.use main@ { connection ->
             connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS).use { statement ->
