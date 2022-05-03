@@ -1,8 +1,9 @@
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 plugins {
-    kotlin("jvm") version "1.6.20"
-    id("net.minecrell.plugin-yml.bukkit") version "0.3.0"
+    kotlin("jvm") version "1.6.21"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 
 group = "net.testusuke"
@@ -16,17 +17,23 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
     compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+    testImplementation("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
     testImplementation(kotlin("test"))
 }
 
 bukkit {
     name = project.name
     version = project.version.toString()
-    main = "$group.${project.name.toLowerCaseAsciiOnly()}.Main"
+    main = "$group.thealloutwar.Main"
     author = "testusuke"
     apiVersion = "1.17"
+    commands {
+        register("war") {
+            description = "General command"
+        }
+    }
 }
 
 tasks {
