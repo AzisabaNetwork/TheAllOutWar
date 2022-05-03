@@ -3,6 +3,7 @@ package net.testusuke.thealloutwar
 import net.testusuke.thealloutwar.Main.Companion.plugin
 import java.sql.*
 
+
 /**
  * Created by testusuke on 2022/04/29
  * @author testusuke
@@ -52,18 +53,9 @@ class DataBase {
         }
     }
 
-    inline fun <R> useConnection(run: Connection.() -> R): R? {
-        return getConnection()?.use(run)
-    }
-
-    /*
-        DataBase.query("SQL", args..., {
-            if (this.next()){}
-        })
-     */
     inline fun <R,T> query(sql: String, vararg params: T, run: ResultSet.() -> R) {
-        useConnection {
-            this.prepareStatement(sql).use { statement ->
+        getConnection()?.use { connection ->
+            connection.prepareStatement(sql).use { statement ->
                 params.forEachIndexed { index, param ->
                     statement.setString(index, param.toString())
                 }
@@ -72,33 +64,36 @@ class DataBase {
         }
     }
 
-    //  TODO 高階関数について理解を深める
-    /*
+    //  todo useConnectionを廃止すればいけるかも？
+
     fun update(sql: String, vararg params: String): Int? {
-        useConnection {
-            this.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS).use { statement ->
+        return getConnection()?.use main@ { connection ->
+            connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS).use { statement ->
                 params.forEachIndexed { index, option ->
                     statement.setString(index, option)
                 }
                 val r = statement.executeUpdate()
-                if (r == 0) return null
-                return 0
+                if (r == 0) return@main null
+                //  get index
+                statement.generatedKeys.use { generatedKeys ->
+                    if (!generatedKeys.next()) return@main null
+                    return@main generatedKeys.getInt(1)
+                }
             }
         }
     }
 
     fun execute(sql: String, vararg options: String): Boolean? {
-        return useConnection {
+        return getConnection()?.use main@ { connection ->
             //  execute
-            this.prepareStatement(sql).use { statement ->
+            connection.prepareStatement(sql).use { statement ->
                 options.forEachIndexed { index, option ->
                     statement.setString(index, option)
                 }
-               return statement.execute()
+               return@main statement.execute()
             }
         }
     }
-    */
 
     private fun testConnect(): Boolean {
         plugin.logger.info("testing connection...")
