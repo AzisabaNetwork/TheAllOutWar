@@ -3,7 +3,6 @@ package net.testusuke.thealloutwar
 import net.testusuke.thealloutwar.Main.Companion.plugin
 import java.sql.*
 
-
 /**
  * Created by testusuke on 2022/04/29
  * @author testusuke
@@ -64,29 +63,43 @@ class DataBase {
         }
     }
 
-    fun update(sql: String, vararg params: String): Int? {
+    fun <T> update(sql: String, vararg params: T): Int? {
         return getConnection()?.use main@ { connection ->
             connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS).use { statement ->
-                params.forEachIndexed { index, option ->
-                    statement.setString(index, option)
+                params.forEachIndexed { index, param ->
+                    statement.setString(index, param.toString())
+                }
+                return@main statement.executeUpdate()
+            }
+        }
+    }
+
+    fun <T> insert(sql: String, vararg params: T): ArrayList<Int>? {
+        return getConnection()?.use main@ { connection ->
+            connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS).use { statement ->
+                params.forEachIndexed { index, param ->
+                    statement.setString(index, param.toString())
                 }
                 val r = statement.executeUpdate()
                 if (r == 0) return@main null
                 //  get index
                 statement.generatedKeys.use { generatedKeys ->
-                    if (!generatedKeys.next()) return@main null
-                    return@main generatedKeys.getInt(1)
+                    val array = arrayListOf<Int>()
+                    while (generatedKeys.next()) {
+                        array.add(generatedKeys.getInt("id"))
+                    }
+                    return@main array
                 }
             }
         }
     }
 
-    fun execute(sql: String, vararg options: String): Boolean? {
+    fun <T> execute(sql: String, vararg options: T): Boolean? {
         return getConnection()?.use main@ { connection ->
             //  execute
             connection.prepareStatement(sql).use { statement ->
-                options.forEachIndexed { index, option ->
-                    statement.setString(index, option)
+                options.forEachIndexed { index, param ->
+                    statement.setString(index, param.toString())
                 }
                return@main statement.execute()
             }
