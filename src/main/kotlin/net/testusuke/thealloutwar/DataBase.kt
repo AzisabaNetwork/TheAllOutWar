@@ -52,13 +52,13 @@ class DataBase {
         }
     }
 
-    inline fun <R,T> query(sql: String, vararg params: T, run: ResultSet.() -> R) {
-        getConnection()?.use { connection ->
+    inline fun <T, R> query(sql: String, vararg params: T, run: ResultSet.() -> R) {
+        getConnection()?.use main@ { connection ->
             connection.prepareStatement(sql).use { statement ->
                 params.forEachIndexed { index, param ->
                     statement.setString(index, param.toString())
                 }
-                statement.executeQuery().use(run)
+                return@main statement.executeQuery().use(run)
             }
         }
     }
