@@ -11,6 +11,17 @@ import java.sql.SQLException
  */
 object KitManager {
 
+    fun list(): ArrayList<Kit> {
+        val list = ArrayList<Kit>()
+        dataBase.query<Unit, Unit>("SELECT id FROM `kit`") {
+            while (this.next()) {
+                val kit = getKit(this.getInt("id")) ?: continue
+                list.add(kit)
+            }
+        }
+        return list
+    }
+
     fun createKit(name: String, inventory: Inventory): Int? {
         //  check if name is already existed
         if (getId(name) == null) return null
