@@ -21,6 +21,9 @@ object Command: CommandExecutor {
             "help" -> help(sender)
             //  kit command
             "kit" -> KitCommand.onCommand(sender, args.sliceArray((1 until args.size).toList()))
+            //  Map Command
+            "map" -> MapCommand.onCommand(sender, args.sliceArray((1 until args.size).toList()))
+
         }
         return true
     }
